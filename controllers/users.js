@@ -42,12 +42,19 @@ module.exports = {
     });
   },
 
-  signIn: async (req, res, next) => {},
+  signIn: async (req, res, next) => {
+    const token = signToken(req.user);
+    res.status(200).json({
+      token,
+      message: 'Signed in Successfully.'
+    });
+  },
 
   dashboard: async (req, res, next) => {
     console.log('I managed to get here!');
     res.json({
-      ctaText: 'Book a Mentor'
+      ctaText: 'Book a Mentor',
+      email: req.user.email
     });
   }
 };
