@@ -1,12 +1,53 @@
+const JWT = require('jsonwebtoken');
+const User = require('../models/user');
+const { JWT_SECRET } = require('../config');
+
+signToken = user => {
+  return JWT.sign(
+    {
+      iss: 'Jointify',
+      sub: user.id,
+      iat: new Date().getTime(), // Current time
+      exp: new Date().setDate(new Date().getDate() + 1) // Current time + 24 hours.
+    },
+    JWT_SECRET
+  );
+};
+
 module.exports = {
   signUp: async (req, res, next) => {
-    console.log(req.value.body);
-    console.log('Sign up function called from the Controller');
+    const { email, password } = req.value.body;
+
+    const foundUser = await User.findOne({
+      email
+    });
+
+    if (foundUser) {
+      return res.status(403).json({
+        error: 'Email is already in use'
+      });
+    }
+
+    const newUser = new User({
+      email,
+      password
+    });
+
+    await newUser.save();
+
+    const token = signToken(newUser);
+
+    res.status(200).json({
+      token
+    });
   },
-  signIn: async (req, res, next) => {
-    console.log('Sign in function called from the Controller');
-  },
+
+  signIn: async (req, res, next) => {},
+
   dashboard: async (req, res, next) => {
-    console.log('Dashboard function called from the Controller');
+    console.log('I managed to get here!');
+    res.json({
+      ctaText: 'Book a Mentor'
+    });
   }
 };

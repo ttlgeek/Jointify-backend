@@ -2,8 +2,17 @@ const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const mongoose = require('mongoose');
 
+// Initiate App
 const app = express();
+
+// Database Connection
+mongoose.connect(
+  'mongodb://localhost/jointifybackend',
+  { useNewUrlParser: true }
+);
+mongoose.set('useCreateIndex', true);
 
 // Middlewares.
 
