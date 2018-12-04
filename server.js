@@ -21,6 +21,15 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 
 // Routes.
+
+// Root path.
+
+app.get('/', function(req, res) {
+  res.send('Api root');
+});
+
+// User Routes.
+
 app.use('/users', require('./routes/users'));
 
 // Start Server.

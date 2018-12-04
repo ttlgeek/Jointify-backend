@@ -51,9 +51,13 @@ module.exports = {
   },
 
   dashboard: async (req, res, next) => {
-    console.log('I managed to get here!');
     res.json({
-      ctaText: 'Book a Mentor',
+      ctaText: 'Book a Mentor'
+    });
+  },
+
+  profile: async (req, res, next) => {
+    res.json({
       email: req.user.email
     });
   }
