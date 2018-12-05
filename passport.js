@@ -43,6 +43,7 @@ passport.use(
         }
 
         const isMatch = await user.isValidPassword(password);
+
         if (!isMatch) {
           return done(null, false);
         }

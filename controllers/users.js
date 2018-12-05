@@ -1,6 +1,7 @@
 const JWT = require('jsonwebtoken');
 const User = require('../models/user');
 const { JWT_SECRET } = require('../config');
+const randomstring = require('randomstring');
 
 signToken = user => {
   return JWT.sign(
@@ -16,7 +17,7 @@ signToken = user => {
 
 module.exports = {
   signUp: async (req, res, next) => {
-    const { email, password } = req.value.body;
+    const { email, password, passwordConfirmation } = req.value.body;
 
     const foundUser = await User.findOne({
       email
@@ -24,13 +25,18 @@ module.exports = {
 
     if (foundUser) {
       return res.status(403).json({
-        error: 'Email is already in use'
+        message: 'Email is already in use'
       });
     }
 
+    const secretToken = randomstring.generate();
+    let active = false;
+
     const newUser = new User({
       email,
-      password
+      password,
+      secretToken,
+      active
     });
 
     await newUser.save();
@@ -44,6 +50,7 @@ module.exports = {
 
   signIn: async (req, res, next) => {
     const token = signToken(req.user);
+
     res.status(200).json({
       token,
       message: 'Signed in Successfully.'
@@ -57,8 +64,10 @@ module.exports = {
   },
 
   profile: async (req, res, next) => {
+    const user = req.user;
     res.json({
-      email: req.user.email
+      email: user.email,
+      active: user.active
     });
   }
 };

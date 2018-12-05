@@ -21,7 +21,16 @@ module.exports = {
       email: Joi.string()
         .email()
         .required(),
-      password: Joi.string().required()
+      password: Joi.string().required(),
+      passwordConfirmation: Joi.string()
+        .valid(Joi.ref('password'))
+        .options({
+          language: {
+            any: {
+              allowOnly: '!!Passwords do not match'
+            }
+          }
+        })
     })
   }
 };
