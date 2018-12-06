@@ -1,39 +1,53 @@
 const express = require('express');
 const morgan = require('morgan');
-const bodyParser = require('body-parser');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 // Initiate App
 const app = express();
 
-// Database Connection
-mongoose.connect(
-  'mongodb://localhost/jointifybackend',
-  { useNewUrlParser: true }
-);
-mongoose.set('useCreateIndex', true);
-
 // Middlewares.
 
-app.use(cors());
 app.use(morgan('dev'));
+app.use(
+  cors({
+    origin: 'http://localhost:3000'
+  })
+);
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+// Database Connection
+
+const connectDB = async () => {
+  try {
+    await mongoose.connect(
+      'mongodb://localhost/jointifybackend',
+      { useNewUrlParser: true, autoIndex: false }
+    );
+    console.log('mongoDB connected');
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+// 1- fire up the db connection
+connectDB();
 
 // Routes.
 
-// Root path.
+// 1- Root path.
 
 app.get('/', function(req, res) {
   res.send('Api root');
 });
 
-// User Routes.
+// 2- User Routes.
 
 app.use('/users', require('./routes/users'));
 
 // Start Server.
 
 const port = process.env.PORT || 9001;
-app.listen(port);
-console.log(`Server listening at port ${port}`);
+app.listen(port, () => console.log(`Api listening on port: ${port}`));

@@ -1,47 +1,51 @@
-const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const bcrypt = require('bcryptjs');
+
+const { Schema } = mongoose;
 
 // Creating the Schema.
 
 const userSchema = new Schema({
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  secretToken: {
-    type: String,
-    required: true
-  },
-  active: {
-    type: Boolean,
-    required: true
-  }
+	email: {
+		type: String,
+		required: true,
+		unique: true,
+		lowercase: true,
+		trim: true
+	},
+	password: {
+		type: String,
+		required: true,
+		minlength: 8
+	},
+	secretToken: {
+		type: String,
+		required: true
+	},
+	active: {
+		type: Boolean,
+		required: true,
+		default: false
+	}
 });
 
-userSchema.pre('save', async function(next) {
-  try {
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(this.password, salt);
-    this.password = passwordHash;
-    next();
-  } catch (error) {
-    next(error);
-  }
+userSchema.pre('save', async function (next) {
+	try {
+		const salt = await bcrypt.genSalt(10);
+		const passwordHash = await bcrypt.hash(this.password, salt);
+		this.password = passwordHash;
+		next();
+	} catch (error) {
+		next(error);
+	}
 });
 
-userSchema.methods.isValidPassword = async function(newPassword) {
-  try {
-    return await bcrypt.compare(newPassword, this.password);
-  } catch (error) {
-    throw new Error(error);
-  }
+userSchema.methods.isValidPassword = async function (newPassword) {
+	try {
+		return await bcrypt.compare(newPassword, this.password);
+	} catch (error) {
+		throw new Error(error);
+	}
 };
 
 // Creating the Model.

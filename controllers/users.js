@@ -1,73 +1,83 @@
 const JWT = require('jsonwebtoken');
-const User = require('../models/user');
-const { JWT_SECRET } = require('../config');
 const randomstring = require('randomstring');
 
-signToken = user => {
-  return JWT.sign(
-    {
-      iss: 'Jointify',
-      sub: user.id,
-      iat: new Date().getTime(), // Current time
-      exp: new Date().setDate(new Date().getDate() + 1) // Current time + 24 hours.
-    },
-    JWT_SECRET
-  );
+const User = require('../models/user');
+const { JWT_SECRET } = require('../config');
+
+const signToken = user => {
+	return JWT.sign(
+		{
+			iss: 'Jointify',
+			sub: user.id,
+			iat: new Date().getTime(), // Current time
+			exp: new Date().setDate(new Date().getDate() + 1) // Current time + 24 hours.
+		},
+		JWT_SECRET
+	);
 };
 
 module.exports = {
-  signUp: async (req, res, next) => {
-    const { email, password, passwordConfirmation } = req.value.body;
+	signUp: async (req, res) => {
+		try {
+			const { email, password, passwordConfirmation } = req.value.body;
 
-    const foundUser = await User.findOne({
-      email
-    });
+			const foundUser = await User.findOne({
+				email
+			});
 
-    if (foundUser) {
-      return res.status(403).json({
-        message: 'Email is already in use'
-      });
-    }
+			if (foundUser) {
+				return res.status(403).json({
+					message: 'Email is already in use'
+				});
+			}
 
-    const secretToken = randomstring.generate();
-    let active = false;
+			const secretToken = randomstring.generate();
 
-    const newUser = new User({
-      email,
-      password,
-      secretToken,
-      active
-    });
+			const newUser = new User({
+				email,
+				password,
+				secretToken
+			});
 
-    await newUser.save();
+			await newUser.save();
 
-    const token = signToken(newUser);
+			const token = signToken(newUser);
 
-    res.status(200).json({
-      token
-    });
-  },
+			res.status(200).json({
+				token
+			});
+		} catch (err) {
+			res.status(400).json({ error: 'Something went wrong' });
+		}
+	},
 
-  signIn: async (req, res, next) => {
-    const token = signToken(req.user);
+	signIn: async (req, res) => {
+		try {
+			const token = signToken(req.user);
 
-    res.status(200).json({
-      token,
-      message: 'Signed in Successfully.'
-    });
-  },
+			res.status(200).json({
+				token,
+				message: 'Signed in Successfully.'
+			});
+		} catch (err) {
+			res.status(400).json({
+				error:
+          'We dont recognize this e-mail or password. Double-check your information and try again.'
+			});
+		}
+	},
 
-  dashboard: async (req, res, next) => {
-    res.json({
-      ctaText: 'Book a Mentor'
-    });
-  },
+	dashboard: async (req, res) => {
+		res.json({
+			ctaText: 'Book a Mentor'
+		});
+	},
 
-  profile: async (req, res, next) => {
-    const user = req.user;
-    res.json({
-      email: user.email,
-      active: user.active
-    });
-  }
+	profile: async (req, res) => {
+		const { email, active } = req.user;
+		res.json({
+			email,
+			active
+		});
+	}
 };
