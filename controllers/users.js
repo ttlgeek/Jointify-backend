@@ -1,8 +1,8 @@
-const JWT = require('jsonwebtoken');
-const randomstring = require('randomstring');
+import JWT from 'jsonwebtoken';
+import randomstring from 'randomstring';
 
-const User = require('../models/user');
-const { JWT_SECRET } = require('../config');
+import User from '../models/user';
+import { JWT_SECRET } from '../config';
 
 const signToken = user => {
 	return JWT.sign(
@@ -16,68 +16,67 @@ const signToken = user => {
 	);
 };
 
-module.exports = {
-	signUp: async (req, res) => {
-		try {
-			const { email, password, passwordConfirmation } = req.value.body;
+export const signUp = async (req, res) => {
+	try {
+		// eslint-disable-next-line no-unused-vars
+		const { email, password, passwordConfirmation } = req.value.body;
 
-			const foundUser = await User.findOne({
-				email
-			});
-
-			if (foundUser) {
-				return res.status(403).json({
-					message: 'Email is already in use'
-				});
-			}
-
-			const secretToken = randomstring.generate();
-
-			const newUser = new User({
-				email,
-				password,
-				secretToken
-			});
-
-			await newUser.save();
-
-			const token = signToken(newUser);
-
-			res.status(200).json({
-				token
-			});
-		} catch (err) {
-			res.status(400).json({ error: 'Something went wrong' });
-		}
-	},
-
-	signIn: async (req, res) => {
-		try {
-			const token = signToken(req.user);
-
-			res.status(200).json({
-				token,
-				message: 'Signed in Successfully.'
-			});
-		} catch (err) {
-			res.status(400).json({
-				error:
-          'We dont recognize this e-mail or password. Double-check your information and try again.'
-			});
-		}
-	},
-
-	dashboard: async (req, res) => {
-		res.json({
-			ctaText: 'Book a Mentor'
+		const foundUser = await User.findOne({
+			email
 		});
-	},
 
-	profile: async (req, res) => {
-		const { email, active } = req.user;
-		res.json({
+		if (foundUser) {
+			return res.status(403).json({
+				message: 'Email is already in use'
+			});
+		}
+
+		const secretToken = randomstring.generate();
+
+		const newUser = new User({
 			email,
-			active
+			password,
+			secretToken
+		});
+
+		await newUser.save();
+
+		const token = signToken(newUser);
+
+		res.status(200).json({
+			token
+		});
+	} catch (err) {
+		res.status(400).json({ error: 'Something went wrong' });
+	}
+};
+
+export const signIn = async (req, res) => {
+	try {
+		const token = signToken(req.user);
+
+		res.status(200).json({
+			token,
+			message: 'Signed in Successfully.'
+		});
+	} catch (err) {
+		res.status(400).json({
+			error:
+        'We dont recognize this e-mail or password. Double-check your information and try again.'
 		});
 	}
+};
+
+export const dashboard = async (req, res) => {
+	res.json({
+		ctaText: 'Book a Mentor'
+	});
+};
+
+export const profile = async (req, res) => {
+	const { email, active } = req.user;
+	res.json({
+		email,
+		active
+	});
 };

@@ -1,19 +1,24 @@
-const express = require('express');
-const morgan = require('morgan');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
+import express, { Router } from 'express';
+import morgan from 'morgan';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import mongoose from 'mongoose';
+import { logger } from './helpers';
+import route from './routes/users';
+import { errors } from './handlers';
 
 // Initiate App
 const app = express();
+
+const router = new Router();
 
 // Middlewares.
 
 app.use(morgan('dev'));
 app.use(
-  cors({
-    origin: 'http://localhost:3000'
-  })
+	cors({
+		origin: 'http://localhost:3000'
+	})
 );
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -21,15 +26,15 @@ app.use(bodyParser.json());
 // Database Connection
 
 const connectDB = async () => {
-  try {
-    await mongoose.connect(
-      'mongodb://localhost/jointifybackend',
-      { useNewUrlParser: true, autoIndex: false }
-    );
-    console.log('mongoDB connected');
-  } catch (err) {
-    console.log(err);
-  }
+	try {
+		await mongoose.connect(
+			'mongodb://localhost/jointifybackend',
+			{ useNewUrlParser: true, autoIndex: false }
+		);
+		console.log('mongoDB connected');
+	} catch (err) {
+		console.log(err);
+	}
 };
 
 // 1- fire up the db connection
@@ -39,15 +44,22 @@ connectDB();
 
 // 1- Root path.
 
-app.get('/', function(req, res) {
-  res.send('Api root');
+app.get('/', (req, res) => {
+	res.send('Api root');
 });
 
 // 2- User Routes.
 
-app.use('/users', require('./routes/users'));
+app.use('/users', route);
+
+// 3- Error Handling Middlewares.
+
+router.use(errors.notFound, errors.format, errors.handler);
 
 // Start Server.
 
-const port = process.env.PORT || 9001;
-app.listen(port, () => console.log(`Api listening on port: ${port}`));
+const PORT = process.env.PORT || 9001;
+app.listen(PORT, err => {
+	if (err) throw err;
+	logger.info(`> Ready on http://localhost:${PORT}`);
+});
