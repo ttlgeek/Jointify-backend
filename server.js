@@ -3,6 +3,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
+import passport from 'passport';
 import { logger } from './helpers';
 import route from './routes/users';
 import { errors } from './handlers';
@@ -22,6 +23,8 @@ app.use(
 );
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+app.use(passport.initialize());
 
 // Database Connection
 

@@ -1,7 +1,7 @@
 import passport from 'passport';
 import { ExtractJwt } from 'passport-jwt';
-import { JWT_SECRET } from './config';
 import User from './models/user';
+import { JWT_SECRET } from './config';
 
 const JWTStrategy = require('passport-jwt').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
@@ -17,12 +17,18 @@ passport.use(
 		try {
 			const user = await User.findById(payload.sub);
 			if (!user) {
-				return done(null, false);
+				return done(null, false, {
+					message:
+            'No User has been found with the credentials you have entered'
+				});
 			}
 
 			done(null, user);
 		} catch (error) {
-			done(error, false);
+			done(error, false, {
+				message: 'Something went wrong, it is probably our fault'
+			});
+			console.log(error.message);
 		}
 	})
 );
@@ -40,18 +46,24 @@ passport.use(
 				});
 
 				if (!user) {
-					return done(null, false);
+					return done(null, false, {
+						message: 'No user found with the credentials you have entered'
+					});
 				}
 
 				const isMatch = await user.isValidPassword(password);
 
 				if (!isMatch) {
-					return done(null, false);
+					return done(null, false, {
+						message: 'Email or password Incorrect'
+					});
 				}
 
 				done(null, user);
 			} catch (error) {
-				done(error, false);
+				done(error, false, {
+					message: "Sorry, Something went wrong, it's probably our fault"
+				});
 			}
 		}
 	)
