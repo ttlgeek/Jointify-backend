@@ -5,29 +5,32 @@ const { Schema } = mongoose;
 
 // Creating the Schema.
 
-const userSchema = new Schema({
-	email: {
-		type: String,
-		required: true,
-		unique: true,
-		lowercase: true,
-		trim: true
+const userSchema = new Schema(
+	{
+		email: {
+			type: String,
+			required: true,
+			unique: true,
+			lowercase: true,
+			trim: true
+		},
+		password: {
+			type: String,
+			required: true,
+			minlength: 8
+		},
+		secretToken: {
+			type: String,
+			required: true
+		},
+		active: {
+			type: Boolean,
+			required: true,
+			default: false
+		}
 	},
-	password: {
-		type: String,
-		required: true,
-		minlength: 8
-	},
-	secretToken: {
-		type: String,
-		required: true
-	},
-	active: {
-		type: Boolean,
-		required: true,
-		default: false
-	}
-});
+	{ timestamps: true }
+);
 
 userSchema.pre('save', async function (next) {
 	try {

@@ -2,6 +2,7 @@ import passport from 'passport';
 
 import { profile, signUp, signIn, dashboard } from '../controllers/users';
 import { validateBody, schemas } from '../helpers/routeHelpers';
+
 import passportConf from '../passport'; // eslint-disable-line no-unused-vars
 
 const router = require('express-promise-router')();
