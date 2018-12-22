@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import passport from "passport";
 import { logger } from "./helpers";
 import route from "./routes/users";
+import unauthoriziedRoute from "./routes/unauthorized";
 import { errors } from "./handlers";
 import passportConfig from "./passport";
 
@@ -67,6 +68,10 @@ app.use("/users", route);
 // 3- Error Handling Middlewares.
 
 router.use(errors.notFound, errors.format, errors.handler);
+
+// 4- Unauthorized route
+
+app.use(unauthoriziedRoute);
 
 // Start Server.
 

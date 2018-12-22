@@ -2,9 +2,7 @@ import passport from "passport";
 
 import { profile, signUp, signIn, dashboard } from "../controllers/users";
 import { validateBody, schemas } from "../helpers/routeHelpers";
-
-const passportAuth = passport.authenticate("local", { session: false });
-const passportJWT = passport.authenticate("jwt", { session: false });
+import { passportJWT, passportAuth } from "../config";
 
 const router = require("express-promise-router")();
 
