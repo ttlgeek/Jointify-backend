@@ -7,6 +7,7 @@ import passport from "passport";
 import { logger } from "./helpers";
 import route from "./routes/users";
 import unauthoriziedRoute from "./routes/unauthorized";
+import userNotFoundRoute from "./routes/userNotFound";
 import { errors } from "./handlers";
 import passportConfig from "./passport";
 
@@ -72,6 +73,10 @@ router.use(errors.notFound, errors.format, errors.handler);
 // 4- Unauthorized route
 
 app.use(unauthoriziedRoute);
+
+// 5- User Not Found Route
+
+app.use(userNotFoundRoute);
 
 // Start Server.
 
