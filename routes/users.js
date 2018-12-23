@@ -1,5 +1,3 @@
-import passport from "passport";
-
 import { profile, signUp, signIn, dashboard } from "../controllers/users";
 import { validateBody, schemas } from "../helpers/routeHelpers";
 import { passportJWT, passportAuth } from "../config";

@@ -13,7 +13,10 @@ export const IS_TEST = NODE_ENV === "test";
 export const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 9001;
 export const JWT_SECRET =
   process.env.JWT_SECRET || "2EGC+1mwpmHXEnvi6YH96ycsbVwZ4Zymwe63Buzc";
-export const passportAuth = passport.authenticate("local", { session: false });
+export const passportAuth = passport.authenticate("local", {
+  session: false,
+  failureRedirect: "/userNotFound"
+});
 export const passportJWT = passport.authenticate("jwt", {
   session: false,
   failureRedirect: "/unauthorized"
